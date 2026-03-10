@@ -24,13 +24,10 @@
   --amber-l:  #fef0dc;
   --red:      #c0392b;
   --red-l:    #fde8e6;
-  --tag-1: #1a3cff; --tag-1l: #e8eeff;
-  --tag-2: #0a7c4a; --tag-2l: #dcf5e8;
-  --tag-3: #b85c00; --tag-3l: #fef0dc;
-  --tag-4: #7c0a6e; --tag-4l: #f5e8f4;
-  --tag-5: #0a527c; --tag-5l: #e0f0fa;
-  --tag-6: #3d7c0a; --tag-6l: #eaf5e0;
+  --sidebar-w: 260px;
 }
+
+html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Cabinet Grotesk', sans-serif;
@@ -39,7 +36,6 @@ body {
   min-height: 100vh;
 }
 
-/* ── GRAIN ── */
 body::after {
   content: '';
   position: fixed; inset: 0; pointer-events: none; z-index: 999;
@@ -47,14 +43,62 @@ body::after {
   opacity: .5;
 }
 
+/* ── MOBILE TOP BAR ── */
+.mobile-topbar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: var(--ink);
+  padding: 0 16px;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(255,255,255,.08);
+}
+.mobile-topbar .mark {
+  width: 30px; height: 30px; background: var(--accent);
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: #fff;
+  flex-shrink: 0;
+}
+.mobile-topbar .title-wrap h1 {
+  font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .04em; text-transform: uppercase;
+}
+.mobile-topbar .title-wrap { display: flex; align-items: center; gap: 10px; }
+.mobile-topbar .pct-badge {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+  background: rgba(26,60,255,.25); color: #8ba4ff;
+  padding: 4px 10px; border-radius: 100px; white-space: nowrap;
+}
+
+.hamburger {
+  width: 36px; height: 36px; border: none; background: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  padding: 4px;
+}
+.hamburger span {
+  display: block; width: 20px; height: 2px; background: rgba(255,255,255,.7); border-radius: 2px;
+  transition: all .25s;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── OVERLAY ── */
+.overlay {
+  display: none; position: fixed; inset: 0; z-index: 90;
+  background: rgba(26,24,20,.5); backdrop-filter: blur(2px);
+}
+.overlay.show { display: block; }
+
 /* ── SIDEBAR ── */
 .sidebar {
-  position: fixed; left: 0; top: 0; bottom: 0; width: 260px;
+  position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w);
   background: var(--ink);
   padding: 32px 0;
   display: flex; flex-direction: column;
-  z-index: 10;
+  z-index: 100;
   border-right: 3px solid #111;
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
 }
 
 .sidebar-logo {
@@ -67,10 +111,7 @@ body::after {
   margin-bottom: 12px;
   font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: #fff;
 }
-.sidebar-logo h1 {
-  font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .04em;
-  text-transform: uppercase;
-}
+.sidebar-logo h1 { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: .04em; text-transform: uppercase; }
 .sidebar-logo p { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 2px; font-family: 'DM Mono', monospace; }
 
 .sidebar-nav { padding: 20px 0; flex: 1; overflow-y: auto; }
@@ -95,6 +136,7 @@ body::after {
 .nav-count {
   margin-left: auto; font-family: 'DM Mono', monospace; font-size: 10px;
   background: rgba(255,255,255,.08); padding: 1px 7px; border-radius: 100px;
+  flex-shrink: 0;
 }
 .nav-item.active .nav-count { background: rgba(26,60,255,.3); color: #8ba4ff; }
 
@@ -102,16 +144,13 @@ body::after {
   padding: 20px 28px 0;
   border-top: 1px solid rgba(255,255,255,.08);
 }
-.overall-progress { }
 .overall-progress .label {
   font-size: 10px; color: rgba(255,255,255,.4); font-family: 'DM Mono', monospace;
   letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px;
   display: flex; justify-content: space-between;
 }
 .overall-progress .label span { color: #fff; }
-.prog-track {
-  height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden;
-}
+.prog-track { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; }
 .prog-fill {
   height: 100%; background: var(--accent); border-radius: 2px;
   transition: width .4s cubic-bezier(.4,0,.2,1);
@@ -119,21 +158,21 @@ body::after {
 }
 
 /* ── MAIN ── */
-.main { margin-left: 260px; padding: 48px 56px; max-width: 960px; }
+.main { margin-left: var(--sidebar-w); padding: 48px 56px; max-width: calc(960px + var(--sidebar-w)); }
 
 /* ── TOP BAR ── */
 .topbar {
   display: flex; align-items: flex-start; justify-content: space-between;
-  margin-bottom: 48px;
+  margin-bottom: 36px; gap: 20px; flex-wrap: wrap;
 }
 .topbar-left h2 { font-size: 32px; font-weight: 900; line-height: 1.1; }
 .topbar-left h2 span { color: var(--accent); }
 .topbar-left p { font-size: 14px; color: var(--ink2); margin-top: 6px; font-family: 'DM Mono', monospace; }
 
-.stats-row { display: flex; gap: 12px; }
+.stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
 .stat-card {
   background: var(--card); border: 1.5px solid var(--rule);
-  border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 80px;
+  border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 76px;
 }
 .stat-card .n { font-size: 26px; font-weight: 900; line-height: 1; }
 .stat-card .l { font-size: 10px; color: var(--ink3); font-family: 'DM Mono', monospace; margin-top: 3px; text-transform: uppercase; letter-spacing: .06em; }
@@ -141,26 +180,36 @@ body::after {
 .stat-card.pend .n { color: var(--amber); }
 .stat-card.total .n { color: var(--accent); }
 
+/* ── DEADLINE BANNER ── */
+.deadline-banner {
+  background: var(--ink); color: #fff; border-radius: 14px;
+  padding: 18px 24px; display: flex; align-items: center; gap: 16px;
+  margin-bottom: 40px; flex-wrap: wrap;
+}
+.deadline-banner .icon { font-size: 24px; flex-shrink: 0; }
+.deadline-banner .text h4 { font-size: 14px; font-weight: 800; }
+.deadline-banner .text p { font-size: 12px; color: rgba(255,255,255,.55); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.deadline-banner .text { flex: 1; min-width: 160px; }
+.deadline-banner .days-left { text-align: right; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+.deadline-banner .days-left .n { font-size: 28px; font-weight: 900; color: #ffcc00; line-height: 1; }
+.deadline-banner .days-left .l { font-size: 10px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; }
+
 /* ── SECTION ── */
 .section { margin-bottom: 40px; }
 .section-header {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 10px;
   margin-bottom: 4px; padding-bottom: 14px;
   border-bottom: 2px solid var(--ink);
+  flex-wrap: wrap;
 }
-.section-num {
-  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
-  color: var(--ink3);
-}
-.section-header h3 { font-size: 19px; font-weight: 800; flex: 1; }
+.section-num { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--ink3); }
+.section-header h3 { font-size: 19px; font-weight: 800; flex: 1; min-width: 120px; }
 .section-tag {
   font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
   padding: 4px 12px; border-radius: 100px; font-family: 'DM Mono', monospace;
-}
-.section-prog {
-  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3);
   white-space: nowrap;
 }
+.section-prog { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); white-space: nowrap; }
 .section-prog span { color: var(--ink); font-weight: 700; }
 
 /* ── ITEMS ── */
@@ -171,7 +220,6 @@ body::after {
   padding: 13px 16px; border-radius: 10px;
   cursor: pointer; transition: background .12s;
   border: 1.5px solid transparent;
-  position: relative;
 }
 .item:hover { background: var(--surface); border-color: var(--rule); }
 .item.checked { background: var(--green-l); border-color: #b3e8ce; }
@@ -183,22 +231,15 @@ body::after {
   display: flex; align-items: center; justify-content: center;
   transition: all .15s; font-size: 13px;
 }
-.item.checked .item-check {
-  background: var(--green); border-color: var(--green); color: #fff;
-}
+.item.checked .item-check { background: var(--green); border-color: var(--green); color: #fff; }
 
 .item-body { flex: 1; min-width: 0; }
-.item-title {
-  font-size: 14px; font-weight: 600; line-height: 1.3;
-  transition: color .15s;
-}
-.item.checked .item-title {
-  text-decoration: line-through; color: var(--ink3);
-}
+.item-title { font-size: 14px; font-weight: 600; line-height: 1.3; transition: color .15s; }
+.item.checked .item-title { text-decoration: line-through; color: var(--ink3); }
 .item-desc { font-size: 12px; color: var(--ink3); margin-top: 3px; font-family: 'DM Mono', monospace; line-height: 1.5; }
 .item.checked .item-desc { color: #a0b8aa; }
 
-.item-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.item-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 .item-hours {
   font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
   background: var(--surface); border: 1px solid var(--rule);
@@ -209,40 +250,11 @@ body::after {
   font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 700;
   padding: 2px 8px; border-radius: 100px; letter-spacing: .04em; text-transform: uppercase;
 }
-
-.item-date {
-  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink3);
-  margin-left: auto; white-space: nowrap;
-}
+.item-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink3); margin-left: auto; white-space: nowrap; }
 .item.checked .item-date { color: var(--green); }
 
-/* ── CONFETTI ── */
 @keyframes pop { 0%{transform:scale(0) rotate(-10deg);opacity:0} 60%{transform:scale(1.2);opacity:1} 100%{transform:scale(1);opacity:1} }
 .item.just-checked .item-check { animation: pop .3s cubic-bezier(.34,1.56,.64,1); }
-
-/* ── CELEBRATION ── */
-#celebration {
-  display: none; position: fixed; inset: 0; z-index: 1000;
-  background: rgba(26,24,20,.7); backdrop-filter: blur(8px);
-  align-items: center; justify-content: center;
-}
-#celebration.show { display: flex; }
-.celeb-card {
-  background: var(--card); border: 2px solid var(--ink);
-  border-radius: 24px; padding: 56px 64px; text-align: center; max-width: 420px;
-  animation: slideUp .4s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
-.celeb-card .big { font-size: 64px; margin-bottom: 16px; }
-.celeb-card h2 { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
-.celeb-card p { color: var(--ink2); font-size: 15px; margin-bottom: 28px; font-family: 'DM Mono', monospace; }
-.celeb-btn {
-  background: var(--ink); color: #fff; border: none; border-radius: 10px;
-  padding: 14px 32px; font-size: 14px; font-weight: 700; cursor: pointer;
-  font-family: 'Cabinet Grotesk', sans-serif; letter-spacing: .02em;
-  transition: transform .1s;
-}
-.celeb-btn:hover { transform: scale(1.03); }
 
 /* ── RESET BTN ── */
 .reset-btn {
@@ -254,32 +266,138 @@ body::after {
 }
 .reset-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-l); }
 
+/* ── CELEBRATION ── */
+#celebration {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(26,24,20,.7); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+#celebration.show { display: flex; }
+.celeb-card {
+  background: var(--card); border: 2px solid var(--ink);
+  border-radius: 24px; padding: 48px 40px; text-align: center; max-width: 420px; width: 100%;
+  animation: slideUp .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+.celeb-card .big { font-size: 64px; margin-bottom: 16px; }
+.celeb-card h2 { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+.celeb-card p { color: var(--ink2); font-size: 14px; margin-bottom: 28px; font-family: 'DM Mono', monospace; }
+.celeb-btn {
+  background: var(--ink); color: #fff; border: none; border-radius: 10px;
+  padding: 14px 32px; font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: 'Cabinet Grotesk', sans-serif; letter-spacing: .02em; transition: transform .1s;
+}
+.celeb-btn:hover { transform: scale(1.03); }
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
 
-/* ── DEADLINE BANNER ── */
-.deadline-banner {
-  background: var(--ink); color: #fff; border-radius: 14px;
-  padding: 18px 24px; display: flex; align-items: center; gap: 16px;
-  margin-bottom: 40px;
+/* ══════════════════════════════════════
+   RESPONSIVE — TABLET (≤ 900px)
+══════════════════════════════════════ */
+@media (max-width: 900px) {
+  :root { --sidebar-w: 220px; }
+  .main { padding: 40px 32px; }
+  .topbar-left h2 { font-size: 26px; }
 }
-.deadline-banner .icon { font-size: 24px; flex-shrink: 0; }
-.deadline-banner .text h4 { font-size: 14px; font-weight: 800; }
-.deadline-banner .text p { font-size: 12px; color: rgba(255,255,255,.55); font-family: 'DM Mono', monospace; margin-top: 2px; }
-.deadline-banner .days-left {
-  margin-left: auto; text-align: right;
-  font-family: 'DM Mono', monospace;
+
+/* ══════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 768px)
+══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Show mobile topbar, hide desktop sidebar logo */
+  .mobile-topbar { display: flex; }
+
+  /* Sidebar becomes a drawer */
+  .sidebar {
+    transform: translateX(-100%);
+    top: 0; /* full height on mobile */
+    padding-top: 72px; /* below mobile topbar */
+    width: 280px;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-logo { display: none; } /* logo already in mobile topbar */
+
+  /* Main content fills full width */
+  .main {
+    margin-left: 0;
+    padding: 80px 16px 32px;
+    max-width: 100%;
+  }
+
+  /* Topbar stacks vertically */
+  .topbar {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .topbar-left h2 { font-size: 28px; }
+  .stats-row { width: 100%; justify-content: flex-start; }
+  .stat-card { flex: 1; min-width: 0; padding: 12px 10px; }
+  .stat-card .n { font-size: 22px; }
+
+  /* Deadline banner wraps */
+  .deadline-banner {
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+  }
+  .deadline-banner .icon { display: none; }
+  .deadline-banner .text h4 { font-size: 13px; }
+  .deadline-banner .text p { font-size: 11px; }
+  .deadline-banner .days-left .n { font-size: 22px; }
+
+  /* Section header wraps nicely */
+  .section-header { gap: 8px; }
+  .section-header h3 { font-size: 16px; width: 100%; order: 1; }
+  .section-num { order: 0; }
+  .section-tag { order: 2; }
+  .section-prog { order: 3; margin-left: auto; }
+
+  /* Items: slightly tighter */
+  .item { padding: 11px 12px; gap: 10px; }
+  .item-title { font-size: 13px; }
+  .item-desc { font-size: 11px; }
+
+  /* Section spacing */
+  .section { margin-bottom: 32px; }
 }
-.deadline-banner .days-left .n { font-size: 28px; font-weight: 900; color: #ffcc00; line-height: 1; }
-.deadline-banner .days-left .l { font-size: 10px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; }
+
+/* ══════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (≤ 400px)
+══════════════════════════════════════ */
+@media (max-width: 400px) {
+  .section-tag { display: none; }
+  .main { padding: 72px 12px 28px; }
+  .topbar-left h2 { font-size: 24px; }
+  .item-desc { display: none; } /* hide descriptions on very small screens */
+  .item-meta { margin-top: 4px; }
+  .stat-card .n { font-size: 20px; }
+}
 </style>
 </head>
 <body>
 
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar">
+  <div class="title-wrap">
+    <div class="mark">CA</div>
+    <h1>Conta Azul</h1>
+  </div>
+  <span class="pct-badge" id="mobile-pct">0%</span>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
 <!-- SIDEBAR -->
-<nav class="sidebar">
+<nav class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div class="mark">CA</div>
     <h1>Conta Azul Integration</h1>
@@ -287,35 +405,35 @@ body::after {
   </div>
   <div class="sidebar-nav">
     <div class="nav-section-label">Módulos</div>
-    <a class="nav-item active" href="#mod-0" onclick="setActive(this)">
-      <span class="nav-dot"></span> Setup &amp; Infraestrutura
+    <a class="nav-item active" href="#mod-0" onclick="navClick(this)">
+      <span class="nav-dot"></span> Setup &amp; Infra
       <span class="nav-count" id="nc-0">0/5</span>
     </a>
-    <a class="nav-item" href="#mod-1" onclick="setActive(this)">
-      <span class="nav-dot"></span> Autenticação OAuth 2.0
+    <a class="nav-item" href="#mod-1" onclick="navClick(this)">
+      <span class="nav-dot"></span> OAuth 2.0
       <span class="nav-count" id="nc-1">0/7</span>
     </a>
-    <a class="nav-item" href="#mod-2" onclick="setActive(this)">
+    <a class="nav-item" href="#mod-2" onclick="navClick(this)">
       <span class="nav-dot"></span> Financeiro
       <span class="nav-count" id="nc-2">0/10</span>
     </a>
-    <a class="nav-item" href="#mod-3" onclick="setActive(this)">
+    <a class="nav-item" href="#mod-3" onclick="navClick(this)">
       <span class="nav-dot"></span> Baixas
       <span class="nav-count" id="nc-3">0/6</span>
     </a>
-    <a class="nav-item" href="#mod-4" onclick="setActive(this)">
+    <a class="nav-item" href="#mod-4" onclick="navClick(this)">
       <span class="nav-dot"></span> Cobranças
       <span class="nav-count" id="nc-4">0/6</span>
     </a>
-    <a class="nav-item" href="#mod-5" onclick="setActive(this)">
+    <a class="nav-item" href="#mod-5" onclick="navClick(this)">
       <span class="nav-dot"></span> Vendas
       <span class="nav-count" id="nc-5">0/9</span>
     </a>
-    <a class="nav-item" href="#mod-6" onclick="setActive(this)">
+    <a class="nav-item" href="#mod-6" onclick="navClick(this)">
       <span class="nav-dot"></span> Contratos
       <span class="nav-count" id="nc-6">0/6</span>
     </a>
-    <a class="nav-item" href="#mod-7" onclick="setActive(this)">
+    <a class="nav-item" href="#mod-7" onclick="navClick(this)">
       <span class="nav-dot"></span> Testes &amp; Entrega
       <span class="nav-count" id="nc-7">0/6</span>
     </a>
@@ -331,42 +449,29 @@ body::after {
 <!-- MAIN -->
 <main class="main">
 
-  <!-- TOP BAR -->
   <div class="topbar">
     <div class="topbar-left">
       <h2>Checklist de<br><span>Desenvolvimento</span></h2>
       <p>API Conta Azul · Laravel · Docker · MySQL</p>
     </div>
     <div class="stats-row">
-      <div class="stat-card total">
-        <div class="n" id="stat-total">55</div>
-        <div class="l">Total</div>
-      </div>
-      <div class="stat-card done">
-        <div class="n" id="stat-done">0</div>
-        <div class="l">Feitas</div>
-      </div>
-      <div class="stat-card pend">
-        <div class="n" id="stat-pend">55</div>
-        <div class="l">Restam</div>
-      </div>
+      <div class="stat-card total"><div class="n" id="stat-total">55</div><div class="l">Total</div></div>
+      <div class="stat-card done"><div class="n" id="stat-done">0</div><div class="l">Feitas</div></div>
+      <div class="stat-card pend"><div class="n" id="stat-pend">55</div><div class="l">Restam</div></div>
     </div>
   </div>
 
-  <!-- DEADLINE BANNER -->
   <div class="deadline-banner">
     <span class="icon">📅</span>
     <div class="text">
       <h4>Prazo de entrega: 31 de Março de 2026</h4>
-      <p>Início: 09/03/2026 · Escopo obrigatório: Auth + Financeiro + Baixas + Cobranças</p>
+      <p>Início: 09/03/2026 · Auth + Financeiro + Baixas + Cobranças</p>
     </div>
     <div class="days-left">
       <div class="n" id="days-left">—</div>
       <div class="l">dias úteis</div>
     </div>
   </div>
-
-  <!-- ═══ SEÇÕES ═══ -->
 
   <!-- 0: Setup -->
   <div class="section" id="mod-0">
@@ -377,18 +482,15 @@ body::after {
       <span class="section-prog" id="sp-0"><span>0</span>/5</span>
     </div>
     <div class="items" id="items-0">
-      <div class="item checked" onclick="toggle(this)" data-h="4h" data-section="0" data-prio="alta">
+      <div class="item checked" onclick="toggle(this)" data-section="0">
         <div class="item-check">✓</div>
         <div class="item-body">
           <div class="item-title">Criar estrutura de pastas do projeto</div>
           <div class="item-desc">contaazul-integration/ · docker/nginx · docker/php · src/</div>
-          <div class="item-meta">
-            <span class="item-hours">4h</span>
-            <span class="item-prio" style="background:var(--red-l);color:var(--red)">Alta</span>
-          </div>
+          <div class="item-meta"><span class="item-hours">4h</span><span class="item-prio" style="background:var(--red-l);color:var(--red)">Alta</span></div>
         </div>
       </div>
-      <div class="item checked" onclick="toggle(this)" data-h="—" data-section="0">
+      <div class="item checked" onclick="toggle(this)" data-section="0">
         <div class="item-check">✓</div>
         <div class="item-body">
           <div class="item-title">Criar Dockerfile (PHP 8.3-FPM + extensões)</div>
@@ -396,7 +498,7 @@ body::after {
           <div class="item-meta"><span class="item-hours">incluso no setup</span></div>
         </div>
       </div>
-      <div class="item checked" onclick="toggle(this)" data-h="—" data-section="0">
+      <div class="item checked" onclick="toggle(this)" data-section="0">
         <div class="item-check">✓</div>
         <div class="item-body">
           <div class="item-title">Criar docker-compose.yml (6 containers)</div>
@@ -404,7 +506,7 @@ body::after {
           <div class="item-meta"><span class="item-hours">incluso no setup</span></div>
         </div>
       </div>
-      <div class="item checked" onclick="toggle(this)" data-h="—" data-section="0">
+      <div class="item checked" onclick="toggle(this)" data-section="0">
         <div class="item-check">✓</div>
         <div class="item-body">
           <div class="item-title">Instalar Laravel 11 + pacotes extras</div>
@@ -412,7 +514,7 @@ body::after {
           <div class="item-meta"><span class="item-hours">incluso no setup</span></div>
         </div>
       </div>
-      <div class="item checked" onclick="toggle(this)" data-h="—" data-section="0">
+      <div class="item checked" onclick="toggle(this)" data-section="0">
         <div class="item-check">✓</div>
         <div class="item-body">
           <div class="item-title">Configurar .env + subir containers + key:generate + migrate</div>
@@ -496,7 +598,7 @@ body::after {
     <div class="section-header">
       <span class="section-num">02</span>
       <h3>💰 Financeiro</h3>
-      <span class="section-tag" style="background:var(--tag-2l);color:var(--tag-2)">obrigatório · prazo 24/03</span>
+      <span class="section-tag" style="background:#dcf5e8;color:#0a7c4a">obrigatório · prazo 24/03</span>
       <span class="section-prog" id="sp-2"><span>0</span>/10</span>
     </div>
     <div class="items" id="items-2">
@@ -509,7 +611,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">GET /v1/conta-financeira — listar e sincronizar contas</div>
           <div class="item-desc">FinanceiroService::sincronizarContas() · persistir no MySQL local</div>
@@ -517,7 +619,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">GET /v1/conta-financeira/{id}/saldo-atual</div>
           <div class="item-desc">Consulta de saldo por conta · cache local opcional</div>
@@ -525,7 +627,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">GET /v1/categorias + GET /v1/financeiro/categorias-dre</div>
           <div class="item-desc">Sincronizar categorias financeiras e categorias DRE</div>
@@ -533,7 +635,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">GET + POST /v1/centro-de-custo</div>
           <div class="item-desc">Leitura e criação de centros de custo</div>
@@ -549,7 +651,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">POST eventos financeiros — criar conta a pagar/receber</div>
           <div class="item-desc">Criação de evento com parcelas, categoria, centro de custo</div>
@@ -557,7 +659,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">GET /v1/financeiro/eventos-financeiros/{id}/parcelas</div>
           <div class="item-desc">Listar parcelas de um evento financeiro específico</div>
@@ -565,7 +667,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">GET /v1/financeiro/transferencias</div>
           <div class="item-desc">Consulta e sincronização de transferências entre contas</div>
@@ -573,7 +675,7 @@ body::after {
         </div>
       </div>
       <div class="item" onclick="toggle(this)" data-section="2">
-        <div class="item-check">✓</div>
+        <div class="item-check"></div>
         <div class="item-body">
           <div class="item-title">Implementar polling + Job SincronizarFinanceiroJob</div>
           <div class="item-desc">Laravel Queue + Scheduler · retry com backoff exponencial para 429</div>
@@ -588,58 +690,16 @@ body::after {
     <div class="section-header">
       <span class="section-num">03</span>
       <h3>📉 Baixas</h3>
-      <span class="section-tag" style="background:var(--tag-3l);color:var(--tag-3)">obrigatório · prazo 26/03</span>
+      <span class="section-tag" style="background:#fef0dc;color:#b85c00">obrigatório · prazo 26/03</span>
       <span class="section-prog" id="sp-3"><span>0</span>/6</span>
     </div>
     <div class="items" id="items-3">
-      <div class="item" onclick="toggle(this)" data-section="3">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Mapear endpoints de baixa na documentação</div>
-          <div class="item-desc">Identificar endpoints de baixa individual e conciliação · testar no mock</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="3">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">POST — Registrar baixa individual de título</div>
-          <div class="item-desc">Envio de data, valor, conta financeira · a pagar e a receber</div>
-          <div class="item-meta"><span class="item-hours">4h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="3">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">POST — Baixa em lote de parcelas</div>
-          <div class="item-desc">Endpoint de lote · tratamento de erros parciais · rollback</div>
-          <div class="item-meta"><span class="item-hours">3h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="3">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET — Consultar e listar baixas realizadas</div>
-          <div class="item-desc">Filtros por período e conta · paginação</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="3">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Conciliação local MySQL × status Conta Azul</div>
-          <div class="item-desc">Comparar status local vs API · marcar divergências · relatório</div>
-          <div class="item-meta"><span class="item-hours">3h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="3">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Testes integrados de baixas + rollback em falha</div>
-          <div class="item-desc">Transações MySQL · retry 429/500 · cenários de erro</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
+      <div class="item" onclick="toggle(this)" data-section="3"><div class="item-check"></div><div class="item-body"><div class="item-title">Mapear endpoints de baixa na documentação</div><div class="item-desc">Identificar endpoints de baixa individual e conciliação · testar no mock</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="3"><div class="item-check"></div><div class="item-body"><div class="item-title">POST — Registrar baixa individual de título</div><div class="item-desc">Envio de data, valor, conta financeira · a pagar e a receber</div><div class="item-meta"><span class="item-hours">4h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="3"><div class="item-check"></div><div class="item-body"><div class="item-title">POST — Baixa em lote de parcelas</div><div class="item-desc">Endpoint de lote · tratamento de erros parciais · rollback</div><div class="item-meta"><span class="item-hours">3h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="3"><div class="item-check"></div><div class="item-body"><div class="item-title">GET — Consultar e listar baixas realizadas</div><div class="item-desc">Filtros por período e conta · paginação</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="3"><div class="item-check"></div><div class="item-body"><div class="item-title">Conciliação local MySQL × status Conta Azul</div><div class="item-desc">Comparar status local vs API · marcar divergências · relatório</div><div class="item-meta"><span class="item-hours">3h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="3"><div class="item-check"></div><div class="item-body"><div class="item-title">Testes integrados de baixas + rollback em falha</div><div class="item-desc">Transações MySQL · retry 429/500 · cenários de erro</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
     </div>
   </div>
 
@@ -648,58 +708,16 @@ body::after {
     <div class="section-header">
       <span class="section-num">04</span>
       <h3>💳 Cobranças</h3>
-      <span class="section-tag" style="background:var(--tag-4l);color:var(--tag-4)">obrigatório · prazo 28/03</span>
+      <span class="section-tag" style="background:#f5e8f4;color:#7c0a6e">obrigatório · prazo 28/03</span>
       <span class="section-prog" id="sp-4"><span>0</span>/6</span>
     </div>
     <div class="items" id="items-4">
-      <div class="item" onclick="toggle(this)" data-section="4">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Mapear cobranças no fluxo de eventos financeiros</div>
-          <div class="item-desc">Cobranças são eventos do tipo receber · entender o payload correto</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="4">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">POST — Criar cobrança (conta a receber)</div>
-          <div class="item-desc">Cliente · valor · vencimento · categoria · centro de custo</div>
-          <div class="item-meta"><span class="item-hours">3h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="4">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET — Listar cobranças com filtros</div>
-          <div class="item-desc">Filtros por status (pago/vencido/aberto) · período · cliente</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="4">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">PUT — Atualizar cobrança existente</div>
-          <div class="item-desc">Atualizar valor, vencimento ou dados da cobrança</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="4">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">DELETE — Cancelar cobrança</div>
-          <div class="item-desc">Validação de estado antes de cancelar · atualizar status local</div>
-          <div class="item-meta"><span class="item-hours">1h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="4">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Polling de status de cobranças + Job SincronizarCobrancasJob</div>
-          <div class="item-desc">Verificação periódica de mudanças de status via scheduler</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
+      <div class="item" onclick="toggle(this)" data-section="4"><div class="item-check"></div><div class="item-body"><div class="item-title">Mapear cobranças no fluxo de eventos financeiros</div><div class="item-desc">Cobranças são eventos do tipo receber · entender o payload correto</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="4"><div class="item-check"></div><div class="item-body"><div class="item-title">POST — Criar cobrança (conta a receber)</div><div class="item-desc">Cliente · valor · vencimento · categoria · centro de custo</div><div class="item-meta"><span class="item-hours">3h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="4"><div class="item-check"></div><div class="item-body"><div class="item-title">GET — Listar cobranças com filtros</div><div class="item-desc">Filtros por status (pago/vencido/aberto) · período · cliente</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="4"><div class="item-check"></div><div class="item-body"><div class="item-title">PUT — Atualizar cobrança existente</div><div class="item-desc">Atualizar valor, vencimento ou dados da cobrança</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="4"><div class="item-check"></div><div class="item-body"><div class="item-title">DELETE — Cancelar cobrança</div><div class="item-desc">Validação de estado antes de cancelar · atualizar status local</div><div class="item-meta"><span class="item-hours">1h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="4"><div class="item-check"></div><div class="item-body"><div class="item-title">Polling de status de cobranças + Job SincronizarCobrancasJob</div><div class="item-desc">Verificação periódica de mudanças de status via scheduler</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
     </div>
   </div>
 
@@ -708,82 +726,19 @@ body::after {
     <div class="section-header">
       <span class="section-num">05</span>
       <h3>🧾 Vendas</h3>
-      <span class="section-tag" style="background:var(--tag-5l);color:var(--tag-5)">secundário</span>
+      <span class="section-tag" style="background:#e0f0fa;color:#0a527c">secundário</span>
       <span class="section-prog" id="sp-5"><span>0</span>/9</span>
     </div>
     <div class="items" id="items-5">
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Criar migrations: vendas, itens_venda, vendedores</div>
-          <div class="item-desc">Modelagem completa das entidades de venda no MySQL</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET /v1/venda/vendedores — sincronizar vendedores</div>
-          <div class="item-desc">Listar e persistir cadastro de vendedores</div>
-          <div class="item-meta"><span class="item-hours">1h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">POST /v1/venda — criar nova venda</div>
-          <div class="item-desc">Payload completo: cliente · itens · quantidades · descontos · pagamento</div>
-          <div class="item-meta"><span class="item-hours">4h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET /v1/venda/busca — listar vendas com filtros + paginação</div>
-          <div class="item-desc">Filtros de data · status · cliente · page e size</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET /v1/venda/{id} + GET /v1/venda/{id}/itens</div>
-          <div class="item-desc">Detalhe completo da venda + listagem de itens</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">PUT /v1/venda/{id} — atualizar venda</div>
-          <div class="item-desc">Atualização parcial ou total de venda existente</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET /v1/venda/{id}/imprimir — download do PDF</div>
-          <div class="item-desc">Download e armazenamento do PDF da venda</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">POST /v1/venda/exclusao-lote — excluir em lote</div>
-          <div class="item-desc">Exclusão de múltiplas vendas · validações de integridade</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="5">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Testes completos do fluxo de vendas</div>
-          <div class="item-desc">Criar → listar → atualizar → excluir · todos os endpoints</div>
-          <div class="item-meta"><span class="item-hours">3h</span></div>
-        </div>
-      </div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">Criar migrations: vendas, itens_venda, vendedores</div><div class="item-desc">Modelagem completa das entidades de venda no MySQL</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">GET /v1/venda/vendedores — sincronizar vendedores</div><div class="item-desc">Listar e persistir cadastro de vendedores</div><div class="item-meta"><span class="item-hours">1h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">POST /v1/venda — criar nova venda</div><div class="item-desc">Payload completo: cliente · itens · quantidades · descontos · pagamento</div><div class="item-meta"><span class="item-hours">4h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">GET /v1/venda/busca — listar vendas com filtros + paginação</div><div class="item-desc">Filtros de data · status · cliente · page e size</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">GET /v1/venda/{id} + GET /v1/venda/{id}/itens</div><div class="item-desc">Detalhe completo da venda + listagem de itens</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">PUT /v1/venda/{id} — atualizar venda</div><div class="item-desc">Atualização parcial ou total de venda existente</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">GET /v1/venda/{id}/imprimir — download do PDF</div><div class="item-desc">Download e armazenamento do PDF da venda</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">POST /v1/venda/exclusao-lote — excluir em lote</div><div class="item-desc">Exclusão de múltiplas vendas · validações de integridade</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="5"><div class="item-check"></div><div class="item-body"><div class="item-title">Testes completos do fluxo de vendas</div><div class="item-desc">Criar → listar → atualizar → excluir · todos os endpoints</div><div class="item-meta"><span class="item-hours">3h</span></div></div></div>
     </div>
   </div>
 
@@ -792,58 +747,16 @@ body::after {
     <div class="section-header">
       <span class="section-num">06</span>
       <h3>📑 Contratos</h3>
-      <span class="section-tag" style="background:var(--tag-6l);color:var(--tag-6)">secundário</span>
+      <span class="section-tag" style="background:#eaf5e0;color:#3d7c0a">secundário</span>
       <span class="section-prog" id="sp-6"><span>0</span>/6</span>
     </div>
     <div class="items" id="items-6">
-      <div class="item" onclick="toggle(this)" data-section="6">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Criar migration: contratos recorrentes</div>
-          <div class="item-desc">Periodicidade · datas · itens · status · cliente</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="6">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET /v1/contratos/proximo-numero</div>
-          <div class="item-desc">Obter número sequencial antes de criar um contrato</div>
-          <div class="item-meta"><span class="item-hours">1h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="6">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">POST /v1/contratos — criar contrato recorrente</div>
-          <div class="item-desc">Periodicidade · datas · forma de pagamento · itens do contrato</div>
-          <div class="item-meta"><span class="item-hours">4h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="6">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">GET /v1/contratos — listar contratos com filtros</div>
-          <div class="item-desc">Filtros por cliente · status · período de vigência</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="6">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Job de monitoramento de renovações automáticas</div>
-          <div class="item-desc">Polling para verificar próximas renovações e notificar sistema</div>
-          <div class="item-meta"><span class="item-hours">3h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="6">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Testes de ponta a ponta do fluxo de contratos</div>
-          <div class="item-desc">Criar → listar → monitorar renovação</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
+      <div class="item" onclick="toggle(this)" data-section="6"><div class="item-check"></div><div class="item-body"><div class="item-title">Criar migration: contratos recorrentes</div><div class="item-desc">Periodicidade · datas · itens · status · cliente</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="6"><div class="item-check"></div><div class="item-body"><div class="item-title">GET /v1/contratos/proximo-numero</div><div class="item-desc">Obter número sequencial antes de criar um contrato</div><div class="item-meta"><span class="item-hours">1h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="6"><div class="item-check"></div><div class="item-body"><div class="item-title">POST /v1/contratos — criar contrato recorrente</div><div class="item-desc">Periodicidade · datas · forma de pagamento · itens do contrato</div><div class="item-meta"><span class="item-hours">4h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="6"><div class="item-check"></div><div class="item-body"><div class="item-title">GET /v1/contratos — listar contratos com filtros</div><div class="item-desc">Filtros por cliente · status · período de vigência</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="6"><div class="item-check"></div><div class="item-body"><div class="item-title">Job de monitoramento de renovações automáticas</div><div class="item-desc">Polling para verificar próximas renovações e notificar sistema</div><div class="item-meta"><span class="item-hours">3h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="6"><div class="item-check"></div><div class="item-body"><div class="item-title">Testes de ponta a ponta do fluxo de contratos</div><div class="item-desc">Criar → listar → monitorar renovação</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
     </div>
   </div>
 
@@ -856,54 +769,12 @@ body::after {
       <span class="section-prog" id="sp-7"><span>0</span>/6</span>
     </div>
     <div class="items" id="items-7">
-      <div class="item" onclick="toggle(this)" data-section="7">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Verificar renovação da conta de desenvolvedor Conta Azul (30 dias)</div>
-          <div class="item-desc">Conta expira após 30 dias · solicitar extensão se necessário</div>
-          <div class="item-meta"><span class="item-hours">0.5h</span><span class="item-prio" style="background:var(--red-l);color:var(--red)">Urgente</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="7">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Testes de retry + backoff exponencial (HTTP 429)</div>
-          <div class="item-desc">Simular rate limiting · verificar comportamento de todos os services</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="7">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Teste de renovação automática de token em produção</div>
-          <div class="item-desc">Aguardar expiração do token e confirmar que o Middleware renova sem interrupção</div>
-          <div class="item-meta"><span class="item-hours">1h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="7">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Verificar que polling está rodando (queue + scheduler)</div>
-          <div class="item-desc">docker compose logs queue · docker compose logs scheduler</div>
-          <div class="item-meta"><span class="item-hours">1h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="7">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">Finalizar README.md — instruções de instalação e uso</div>
-          <div class="item-desc">.env.example · comandos artisan · troubleshooting · arquitetura</div>
-          <div class="item-meta"><span class="item-hours">2h</span></div>
-        </div>
-      </div>
-      <div class="item" onclick="toggle(this)" data-section="7">
-        <div class="item-check">✓</div>
-        <div class="item-body">
-          <div class="item-title">🎯 Entrega final — 31/03/2026</div>
-          <div class="item-desc">Auth + Financeiro + Baixas + Cobranças entregues e funcionando</div>
-          <div class="item-meta"><span class="item-hours">—</span><span class="item-prio" style="background:var(--accent-l);color:var(--accent)">Entrega</span></div>
-        </div>
-      </div>
+      <div class="item" onclick="toggle(this)" data-section="7"><div class="item-check"></div><div class="item-body"><div class="item-title">Verificar renovação da conta de desenvolvedor Conta Azul (30 dias)</div><div class="item-desc">Conta expira após 30 dias · solicitar extensão se necessário</div><div class="item-meta"><span class="item-hours">0.5h</span><span class="item-prio" style="background:var(--red-l);color:var(--red)">Urgente</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="7"><div class="item-check"></div><div class="item-body"><div class="item-title">Testes de retry + backoff exponencial (HTTP 429)</div><div class="item-desc">Simular rate limiting · verificar comportamento de todos os services</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="7"><div class="item-check"></div><div class="item-body"><div class="item-title">Teste de renovação automática de token em produção</div><div class="item-desc">Aguardar expiração do token e confirmar que o Middleware renova sem interrupção</div><div class="item-meta"><span class="item-hours">1h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="7"><div class="item-check"></div><div class="item-body"><div class="item-title">Verificar que polling está rodando (queue + scheduler)</div><div class="item-desc">docker compose logs queue · docker compose logs scheduler</div><div class="item-meta"><span class="item-hours">1h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="7"><div class="item-check"></div><div class="item-body"><div class="item-title">Finalizar README.md — instruções de instalação e uso</div><div class="item-desc">.env.example · comandos artisan · troubleshooting · arquitetura</div><div class="item-meta"><span class="item-hours">2h</span></div></div></div>
+      <div class="item" onclick="toggle(this)" data-section="7"><div class="item-check"></div><div class="item-body"><div class="item-title">🎯 Entrega final — 31/03/2026</div><div class="item-desc">Auth + Financeiro + Baixas + Cobranças entregues e funcionando</div><div class="item-meta"><span class="item-hours">—</span><span class="item-prio" style="background:var(--accent-l);color:var(--accent)">Entrega</span></div></div></div>
     </div>
   </div>
 
@@ -923,10 +794,8 @@ body::after {
 
 <script>
   const TOTAL = 55;
-  const state = JSON.parse(localStorage.getItem('ca_checklist') || '{}');
-
-  // counts per section
   const sectionCounts = {0:5,1:7,2:10,3:6,4:6,5:9,6:6,7:6};
+  const state = JSON.parse(localStorage.getItem('ca_checklist') || '{}');
 
   function save() { localStorage.setItem('ca_checklist', JSON.stringify(state)); }
 
@@ -951,6 +820,8 @@ body::after {
       el.classList.add('just-checked');
       setTimeout(() => el.classList.remove('just-checked'), 400);
     }
+    const ck = el.querySelector('.item-check');
+    ck.textContent = checked ? '✓' : '';
     const dateEl = el.querySelector('.item-date');
     if (checked) {
       if (!dateEl) {
@@ -971,24 +842,18 @@ body::after {
       let done = 0;
       items.forEach(item => { if (state[getKey(item)]) done++; });
       total += done;
-      // section progress
       const sp = document.getElementById(`sp-${s}`);
       if (sp) sp.innerHTML = `<span>${done}</span>/${sectionCounts[s]}`;
-      // nav count
       const nc = document.getElementById(`nc-${s}`);
       if (nc) { nc.textContent = `${done}/${sectionCounts[s]}`; nc.style.color = done === sectionCounts[s] ? '#3fb950' : ''; }
     }
-    // stats
     document.getElementById('stat-done').textContent = total;
     document.getElementById('stat-pend').textContent = TOTAL - total;
-    // progress
     const pct = Math.round(total / TOTAL * 100);
     document.getElementById('prog-fill').style.width = pct + '%';
     document.getElementById('pct-label').textContent = pct + '%';
-
-    if (total === TOTAL) {
-      setTimeout(() => document.getElementById('celebration').classList.add('show'), 600);
-    }
+    document.getElementById('mobile-pct').textContent = pct + '%';
+    if (total === TOTAL) setTimeout(() => document.getElementById('celebration').classList.add('show'), 600);
   }
 
   function resetAll() {
@@ -999,29 +864,45 @@ body::after {
       el.classList.remove('checked','just-checked');
       const dateEl = el.querySelector('.item-date');
       if (dateEl) dateEl.remove();
+      el.querySelector('.item-check').textContent = '';
     });
     updateAll();
   }
 
   function closeCeleb() { document.getElementById('celebration').classList.remove('show'); }
 
-  function setActive(el) {
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
+  function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const ham = document.getElementById('hamburger');
+    const open = sidebar.classList.toggle('open');
+    overlay.classList.toggle('show', open);
+    ham.classList.toggle('open', open);
   }
 
-  // Highlight nav on scroll
+  function closeMenu() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+    document.getElementById('hamburger').classList.remove('open');
+  }
+
+  function navClick(el) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    // close drawer on mobile
+    if (window.innerWidth <= 768) setTimeout(closeMenu, 200);
+  }
+
   window.addEventListener('scroll', () => {
     for (let s = 7; s >= 0; s--) {
       const sec = document.getElementById(`mod-${s}`);
-      if (sec && sec.getBoundingClientRect().top <= 120) {
+      if (sec && sec.getBoundingClientRect().top <= 130) {
         document.querySelectorAll('.nav-item').forEach((el,i) => el.classList.toggle('active', i===s));
         break;
       }
     }
   });
 
-  // Days left
   function calcDays() {
     const deadline = new Date('2026-03-31');
     const today = new Date();
@@ -1036,15 +917,13 @@ body::after {
   }
   calcDays();
 
-  // Restaura state a partir do HTML (items já marcados no código)
+  // Restore from HTML initial state
   document.querySelectorAll('.item').forEach(el => {
     const key = getKey(el);
-    const isCheckedInHtml = el.classList.contains('checked');
-    if (isCheckedInHtml && !state[key]) {
-      // Marca no state se está checked no HTML mas não no localStorage
-      state[key] = true;
-    }
+    const htmlChecked = el.classList.contains('checked');
+    if (htmlChecked && !(key in state)) state[key] = true;
     if (state[key]) applyItem(el, true, false);
+    else { el.classList.remove('checked'); el.querySelector('.item-check').textContent = ''; }
   });
   save();
   updateAll();
